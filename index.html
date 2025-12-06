@@ -1,163 +1,1317 @@
+
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>শুভ জন্মদিন, [সৌরভ]!</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>School Sphere - Student App</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            500: '#E11D48',
+                            600: '#BE123C',
+                            700: '#9F1239',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(100%)' },
+                            '100%': { transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@400;700&family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
 
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: 'Hind Siliguri', sans-serif;
-      background:#000;
-      overflow:hidden;
-      color:#fff;
-      text-align:center;
-    }
+        body { font-family: 'Inter', sans-serif; }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+        }
 
-    /* Curtain */
-    #curtain-wrapper {
-      position:fixed; top:0; left:0; width:100%; height:100%;
-      z-index:1000; display:flex; justify-content:center; align-items:center;
-      overflow:hidden;
-    }
-    .curtain {
-      position:absolute; top:0; width:50%; height:100%; background-color:#1a001a;
-      transition:transform 1.5s cubic-bezier(0.86,0,0.07,1);
-    }
-    #curtain-left{ left:0; }
-    #curtain-right{ right:0; }
-    #curtain-wrapper.open #curtain-left{ transform:translateX(-100%); }
-    #curtain-wrapper.open #curtain-right{ transform:translateX(100%); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    #reveal-button {
-      z-index:1001; padding:18px 35px; font-size:1.5em;
-      font-family:'Baloo Da 2', cursive; font-weight:700;
-      cursor:pointer; border:2px solid #fff; border-radius:50px;
-      background:transparent; color:#fff; transition:all 0.5s ease;
-    }
-    #reveal-button:hover { background:#fff; color:#1a001a; transform:scale(1.1); }
-    #curtain-wrapper.open #reveal-button { opacity:0; pointer-events:none; transform:scale(0.5); }
-
-    /* Main Content */
-    .main-content {
-      display:none; opacity:0; padding:40px 20px; max-width:900px; margin:auto;
-      transition:opacity 1.5s ease-in-out 1s;
-    }
-    .main-content.visible{ display:block; opacity:1; }
-
-    .main-message h2 {
-      font-family:'Baloo Da 2', cursive;
-      font-size:3em; font-weight:700;
-      background:linear-gradient(45deg,#ff9a9e,#fecfef,#ffdde1);
-      -webkit-background-clip:text; color:transparent;
-      margin-bottom:20px;
-    }
-    .custom-text { font-size:1.2em; line-height:1.6; margin-bottom:20px; }
-    .date { margin-bottom:25px; font-weight:600; color:#ffccee; }
-
-    .gallery {
-      display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:20px; margin-top:20px;
-    }
-    .gallery-item { border-radius:12px; overflow:hidden; box-shadow:0 5px 20px rgba(0,0,0,0.4); opacity:0; transform:translateY(30px);}
-    .gallery-item.revealed{ animation:fadeInUp 0.8s ease-out forwards; }
-    .gallery-item img{ width:100%; display:block; transition:transform 0.4s ease;}
-    .gallery-item:hover img{ transform:scale(1.1); }
-
-    .signature {
-      font-family:'Baloo Da 2', cursive; font-size:1.5em; margin-top:40px; color:#fecfef;
-    }
-
-    /* Popup Youtube */
-    #video-popup {
-      display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-      background:rgba(0,0,0,0.9); z-index:2000;
-      justify-content:center; align-items:center;
-    }
-    #video-popup iframe{ width:90%; max-width:560px; height:315px; border:none; border-radius:12px; }
-    #close-popup { position:absolute; top:20px; right:30px; font-size:2em; cursor:pointer; color:#fff; }
-
-    @keyframes fadeInUp { from{opacity:0;transform:translateY(30px);} to{opacity:1;transform:translateY(0);} }
-  </style>
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #E11D48;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+    </style>
 </head>
-<body>
 
-  <div id="curtain-wrapper">
-    <div id="curtain-left" class="curtain"></div>
-    <div id="curtain-right" class="curtain"></div>
-    <button id="reveal-button">🎁 সারপ্রাইজ না অপেন করলে মোবাইল নষ্ট হয়ে জাবে 🎁</button>
-  </div>
+<body class="text-gray-800 h-[100dvh] w-full bg-gray-50 overflow-hidden flex flex-col">
 
-  <div class="main-content" id="main-content">
-    <div class="main-message">
-      <h2>শুভ জন্মদিন, [সৌরভ]!</h2>
-      <p class="date">আজকের তারিখ: <span id="today-date"></span></p>
-      <p class="custom-text">
-        আজকের এই বিশেষ দিনে তোর জন্য রইলো আমার পক্ষ থেকে অনেক অনেক ভালোবাসা, দোয়া আর শুভকামনা। এভাবেই সবসময় হাসিখুশি থাকিস আর হালা জাওরামি কম করে করিস!
-      </p>
+    <!-- Certificate Template (Hidden) -->
+    <div id="certificate-template" class="fixed top-0 left-0 -z-50 bg-white p-10 hidden" style="width: 1000px; height: 700px; border: 20px solid #BE123C;">
+        <div class="h-full w-full border-4 border-yellow-500 p-8 flex flex-col items-center justify-center text-center relative bg-orange-50/50">
+            <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+                <i class="fa-solid fa-school text-[400px]"></i>
+            </div>
+            <h1 class="text-5xl font-bold text-brand-600 font-serif mb-2 uppercase tracking-wide">Certificate of Excellence</h1>
+            <div class="w-32 h-1 bg-yellow-500 mb-8"></div>
+            <h2 class="text-3xl font-bold text-gray-800">Charghat Technical School And College</h2>
+            <p class="text-xl text-gray-600 mt-2">চারঘাট, রাজশাহী</p>
+            <p class="text-xl text-gray-500 mt-12 italic">This certificate is proudly presented to</p>
+            <h2 id="cert-name" class="text-6xl font-bold text-brand-600 mt-6 font-serif border-b-2 border-gray-300 pb-2 px-10 inline-block min-w-[500px]">Student Name</h2>
+            <div class="flex gap-8 mt-6 text-xl text-gray-700 font-semibold">
+                <p>ID: <span id="cert-id" class="text-black">0000</span></p>
+                <p>Roll: <span id="cert-roll" class="text-black">0000</span></p>
+            </div>
+            <p class="text-xl text-gray-600 mt-8 max-w-3xl">
+                For achieving the <span class="text-brand-600 font-bold">1st Position</span> in the monthly leaderboard. 
+                Your dedication and hard work are truly commendable.
+            </p>
+            <div class="flex justify-between w-full mt-20 px-20">
+                <div class="text-center">
+                    <div class="w-48 h-0.5 bg-gray-400 mb-2"></div>
+                    <p class="font-bold text-gray-600">Date</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-48 h-0.5 bg-gray-400 mb-2"></div>
+                    <p class="font-bold text-gray-600">Principal Signature</p>
+                </div>
+            </div>
+            <div class="absolute top-10 right-10">
+                 <i class="fa-solid fa-medal text-8xl text-yellow-500 drop-shadow-lg"></i>
+            </div>
+        </div>
     </div>
 
-    <div class="gallery">
-      <div class="gallery-item"><img src="https://i.postimg.cc/G37Zj7DJ/Whats-App-Image-2025-08-22-at-23-21-38-4cba7f41.jpg" alt="Memory 1"></div>
-      <div class="gallery-item"><img src="https://i.postimg.cc/L6JGQtBd/Whats-App-Image-2025-08-22-at-23-22-23-fedcc69a.jpg" alt="Memory 2"></div>
-      <div class="gallery-item"><img src="https://i.postimg.cc/65Fgk8Y8/Whats-App-Image-2025-08-22-at-23-22-24-5251d732.jpg" alt="Memory 3"></div>
+    <!-- MAIN APP CONTAINER (Full Screen Responsive) -->
+    <div id="app-screen" class="flex-1 flex flex-col h-full w-full hidden relative overflow-hidden">
+
+        <!-- AUTH SCREEN -->
+        <div id="auth-screen" class="absolute inset-0 z-50 bg-white flex flex-col justify-center items-center p-6 hidden">
+            <div class="w-full max-w-sm animate-fade-in-up">
+                <h1 class="text-3xl font-bold text-brand-600 mb-2 text-center">School Sphere</h1>
+                <p class="text-gray-500 text-center mb-8">Charghat Govt. Technical School & College</p>
+                
+                <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
+                    <h2 class="text-xl font-bold mb-4">Login</h2>
+                    <form id="login-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" id="login-email" class="mt-1 w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500" required placeholder="student@school.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" id="login-pass" class="mt-1 w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-brand-500 transition">Log In</button>
+                    </form>
+                </div>
+                
+                <p class="mt-8 text-xs text-center text-gray-400">
+                    School Sphere for Charghat Govt. Technical School and College<br>
+                    Contact Admin for credentials.
+                </p>
+            </div>
+        </div>
+        
+        <!-- HEADER -->
+        <header class="bg-white shadow-sm w-full z-20 sticky top-0">
+            <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <img id="app-logo" src="https://via.placeholder.com/40" class="w-8 h-8 rounded-full object-cover">
+                    <span id="app-name" class="font-bold text-lg tracking-tight">School Sphere</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="relative cursor-pointer hover:bg-gray-100 p-2 rounded-full transition" onclick="toggleNotifs()">
+                        <i class="fa-solid fa-bell text-gray-600 text-xl"></i>
+                        <span id="notif-badge" class="absolute top-1 right-1 bg-brand-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">!</span>
+                    </div>
+                    <div class="bg-brand-50 px-3 py-1 rounded-full border border-brand-100 flex items-center gap-1">
+                        <i class="fa-solid fa-coins text-yellow-500"></i>
+                        <span id="user-points" class="font-bold text-brand-700 text-sm">0</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- NOTIFICATIONS -->
+        <div id="notif-panel" class="absolute top-16 right-0 md:right-4 w-full md:w-80 bg-white shadow-2xl md:rounded-xl p-4 hidden z-30 border-b md:border border-gray-100 animate-fade-in-up">
+            <h4 class="font-bold text-sm mb-2 flex justify-between">Notifications <button onclick="toggleNotifs()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-times"></i></button></h4>
+            <div id="notif-list" class="space-y-2 max-h-60 overflow-y-auto text-sm">
+                <div class="text-gray-400 text-xs text-center py-4">Loading notifications...</div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <main id="main-content" class="flex-1 overflow-y-auto pb-24 no-scrollbar bg-gray-50 w-full">
+            <div class="max-w-7xl mx-auto w-full">
+                
+                <!-- HOME TAB -->
+                <section id="tab-home" class="p-4 space-y-8">
+                    <!-- Updated Slider -->
+                    <div id="slider-container" class="w-full aspect-video md:aspect-[3/1] rounded-2xl overflow-hidden shadow-lg relative bg-gray-200">
+                        <!-- Images will be injected here -->
+                    </div>
+
+                    <!-- Responsive Grids -->
+                    <div>
+                        <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-gift text-brand-500"></i> Free Courses</h3>
+                        <div id="free-courses-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"></div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-crown text-yellow-500"></i> Premium Courses</h3>
+                        <div id="premium-courses-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"></div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-blue-500"></i> Free Ebooks</h3>
+                        <div id="free-ebooks-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"></div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-book text-purple-600"></i> Premium Ebooks</h3>
+                        <div id="premium-ebooks-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"></div>
+                    </div>
+                </section>
+
+                <!-- QUIZ TAB -->
+                <section id="tab-quiz" class="p-4 hidden animate-fade-in-up max-w-2xl mx-auto w-full">
+                    <h2 class="text-2xl font-bold mb-4 text-center">Daily Quiz</h2>
+                    <div id="quiz-container" class="bg-white p-6 md:p-10 rounded-2xl shadow-lg text-center border border-gray-100">
+                        <div class="mb-6 text-brand-600 font-bold text-2xl" id="quiz-timer"></div>
+                        <p id="quiz-question" class="text-xl font-medium mb-8">Loading question...</p>
+                        <div id="quiz-options" class="grid grid-cols-1 gap-4"></div>
+                    </div>
+                </section>
+
+                <!-- LEADERBOARD TAB -->
+                <section id="tab-leaderboard" class="p-4 hidden animate-fade-in-up max-w-3xl mx-auto w-full">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Top Students</h2>
+                        <span class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full border">Monthly Ranking</span>
+                    </div>
+                    
+                    <button id="btn-cert" class="hidden w-full mb-6 bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600 text-white font-bold py-4 rounded-xl shadow-lg transform transition hover:scale-105">
+                        <div class="flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-award text-2xl animate-bounce"></i>
+                            <div class="text-left leading-tight">
+                                <div class="text-lg">Download Certificate</div>
+                                <div class="text-xs font-normal opacity-90">Congratulations! You are Rank 1.</div>
+                            </div>
+                        </div>
+                    </button>
+
+                    <div id="leaderboard-list" class="bg-white rounded-xl shadow-sm overflow-hidden divide-y border border-gray-100"></div>
+                </section>
+
+                <!-- PROFILE TAB -->
+                <section id="tab-profile" class="hidden animate-fade-in-up max-w-2xl mx-auto w-full p-4">
+                    <div class="relative mb-20">
+                        <div class="h-32 md:h-48 bg-gradient-to-r from-brand-600 to-brand-500 rounded-b-[2rem] shadow-lg"></div>
+                        <div class="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
+                            <div class="relative group">
+                                <img id="profile-img-real" src="" class="hidden w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl object-cover bg-gray-200">
+                                <div id="profile-initial-div" class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white bg-white shadow-xl flex items-center justify-center text-4xl md:text-5xl font-bold text-brand-600">
+                                    <span id="profile-initial">U</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 text-center space-y-1 mb-8">
+                        <h2 id="profile-name" class="text-3xl font-bold text-gray-800">User Name</h2>
+                        <p id="profile-trade" class="text-sm font-medium text-brand-600 uppercase tracking-wide">Trade Name</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
+                            <span class="text-gray-400 text-xs uppercase font-bold tracking-wider">Roll Number</span>
+                            <span id="profile-roll" class="text-xl font-bold text-gray-800 mt-1">0000</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
+                            <span class="text-gray-400 text-xs uppercase font-bold tracking-wider">Student ID</span>
+                            <span id="profile-id" class="text-xl font-bold text-gray-800 mt-1">0000</span>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div class="p-5 border-b flex items-center gap-4 hover:bg-gray-50 transition">
+                                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fa-solid fa-envelope"></i></div>
+                                <div class="overflow-hidden">
+                                    <p class="text-xs text-gray-400 uppercase font-bold">Email Address</p>
+                                    <p id="profile-email" class="font-medium text-gray-800 truncate">email@example.com</p>
+                                </div>
+                            </div>
+                            <div class="p-5 flex items-center gap-4 hover:bg-gray-50 transition">
+                                <div class="w-10 h-10 rounded-full bg-green-50 text-green-500 flex items-center justify-center"><i class="fa-solid fa-phone"></i></div>
+                                <div>
+                                    <p class="text-xs text-gray-400 uppercase font-bold">Phone Number</p>
+                                    <p id="profile-phone" class="font-medium text-gray-800">+880...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="handleLogout()" class="w-full py-4 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-right-from-bracket"></i> Logout
+                        </button>
+                        
+                        <p class="text-center text-xs text-gray-400 py-4">School Sphere Student App v1.4</p>
+                    </div>
+                </section>
+
+                <!-- VIDEO PLAYER SECTION (Full Screen) -->
+                <section id="course-view" class="bg-white w-full h-full hidden fixed inset-0 z-40 overflow-y-auto">
+                    <div class="max-w-7xl mx-auto w-full min-h-full flex flex-col bg-white">
+                        <div class="sticky top-0 bg-white border-b p-4 flex items-center gap-4 shadow-sm z-50">
+                            <button onclick="closeCourse()" class="text-gray-600 p-2 rounded-full hover:bg-gray-100 transition"><i class="fa-solid fa-arrow-left text-xl"></i></button>
+                            <h2 id="cv-title" class="font-bold truncate text-lg">Course Title</h2>
+                        </div>
+                        
+                        <div class="w-full bg-black flex justify-center sticky top-[69px] z-40">
+                             <!-- Restricted max-width for PC comfort -->
+                            <div class="w-full max-w-5xl aspect-video bg-black relative shadow-lg group">
+                                <iframe id="cv-player" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center border-b bg-gray-50 sticky top-[calc(69px+56.25vw)] md:top-auto z-30 shadow-sm">
+                            <div class="w-full max-w-5xl flex justify-around items-center py-4">
+                                <button onclick="toggleLike()" class="flex flex-col items-center text-gray-500 active:scale-95 transition hover:text-brand-600">
+                                    <i id="vid-like-icon" class="fa-solid fa-heart text-2xl"></i>
+                                    <span id="vid-like-count" class="text-xs font-bold mt-1">0</span>
+                                </button>
+                                <div class="flex flex-col items-center text-gray-500">
+                                    <i class="fa-solid fa-eye text-2xl"></i>
+                                    <span id="vid-view-count" class="text-xs font-bold mt-1">0</span>
+                                </div>
+                                <button onclick="openComments()" class="flex flex-col items-center text-gray-500 active:scale-95 transition hover:text-brand-600">
+                                    <i class="fa-solid fa-comment-dots text-2xl"></i>
+                                    <span id="vid-comment-count" class="text-xs font-bold mt-1">Comments</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-4 pb-32 max-w-5xl mx-auto w-full flex-1">
+                            <h3 class="font-bold text-lg mb-4 text-gray-800">Syllabus</h3>
+                            <div id="cv-syllabus" class="space-y-3"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- EBOOK READER SECTION -->
+                <section id="ebook-view" class="bg-white w-full h-full hidden fixed inset-0 z-40 overflow-y-auto">
+                     <div class="max-w-7xl mx-auto w-full min-h-full flex flex-col bg-white">
+                        <div class="sticky top-0 bg-white border-b p-4 flex items-center gap-4 shadow-sm z-50">
+                            <button onclick="closeEbook()" class="text-gray-600 hover:bg-gray-100 p-2 rounded-full"><i class="fa-solid fa-arrow-left text-xl"></i></button>
+                            <h2 id="eb-title" class="font-bold truncate">Ebook Title</h2>
+                        </div>
+                        
+                        <div class="p-4 flex flex-col items-center gap-6 flex-1 justify-center" id="eb-preview-container">
+                            <div class="w-48 md:w-64 aspect-[3/4] bg-gray-200 rounded-lg shadow-2xl overflow-hidden relative mt-8 hover:scale-105 transition duration-500">
+                                <!-- Ebook Preview Image will show here -->
+                                <img id="eb-cover-preview" src="" class="w-full h-full object-cover">
+                            </div>
+                            <div class="text-center px-4 max-w-lg">
+                                <h2 id="eb-preview-title" class="text-3xl font-bold text-gray-800 mb-3">Book Title</h2>
+                                <p class="text-gray-500 text-sm mb-8">Click the button below to start reading this book.</p>
+                                
+                                <button onclick="startReading()" class="bg-brand-600 text-white px-10 py-4 rounded-full font-bold shadow-xl hover:bg-brand-700 transition transform active:scale-95 flex items-center gap-2 mx-auto">
+                                    <i class="fa-solid fa-book-open"></i> READ NOW
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="eb-frame-container" class="hidden w-full flex-1 bg-gray-100 h-screen">
+                            <iframe id="eb-viewer" src="" class="w-full h-full" frameborder="0"></iframe>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="glass fixed bottom-0 w-full h-20 flex justify-center items-center pb-2 z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+            <div class="max-w-7xl w-full flex justify-around">
+                <button onclick="switchTab('home')" class="nav-btn text-brand-600 flex flex-col items-center gap-1 active w-16" data-target="home">
+                    <i class="fa-solid fa-house text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-medium">Home</span>
+                </button>
+                <button onclick="switchTab('quiz')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 w-16 hover:text-brand-600 transition" data-target="quiz">
+                    <i class="fa-solid fa-clipboard-question text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-medium">Quiz</span>
+                </button>
+                <button onclick="switchTab('leaderboard')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 w-16 hover:text-brand-600 transition" data-target="leaderboard">
+                    <i class="fa-solid fa-chart-simple text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-medium">Rank</span>
+                </button>
+                <button onclick="switchTab('profile')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 w-16 hover:text-brand-600 transition" data-target="profile">
+                    <i class="fa-solid fa-user text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-medium">Profile</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- LIVE CHAT WIDGET -->
+        <div id="chat-widget" class="fixed bottom-24 right-4 z-50 flex flex-col items-end">
+            <div id="chat-box" class="hidden w-80 h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col mb-4 overflow-hidden transition-all animate-fade-in-up origin-bottom-right">
+                <div class="bg-brand-600 p-4 text-white font-bold flex justify-between items-center shadow-md shrink-0">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-headset"></i> Support Chat</span>
+                    <button onclick="toggleChat()" class="hover:bg-brand-700 p-1 rounded"><i class="fa-solid fa-times"></i></button>
+                </div>
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 text-sm">
+                    <div class="text-center text-xs text-gray-400 mt-2">Start a conversation with Admin</div>
+                </div>
+                <form id="chat-form" class="p-3 bg-white border-t flex gap-2 items-center shrink-0">
+                    <input type="text" id="chat-input" class="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500" placeholder="Type a message..." required>
+                    <button type="submit" class="bg-brand-600 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-brand-700 shadow-md transition-colors shrink-0">
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
+                    </button>
+                </form>
+            </div>
+            <button onclick="toggleChat()" class="w-14 h-14 bg-brand-600 rounded-full shadow-lg flex items-center justify-center text-white text-2xl hover:bg-brand-700 transition transform hover:scale-110 active:scale-95">
+                <i class="fa-solid fa-comments"></i>
+            </button>
+        </div>
+
+        <!-- COMMENTS SHEET -->
+        <div id="comment-sheet" class="fixed inset-0 z-[60] hidden flex flex-col justify-end">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeComments()"></div>
+            <div class="bg-white w-full md:max-w-xl md:mx-auto h-[75%] md:h-[600px] md:rounded-t-2xl rounded-t-3xl shadow-2xl z-10 flex flex-col slide-up relative">
+                <div class="w-12 h-1 bg-gray-300 rounded-full self-center mt-3 mb-2 shrink-0"></div>
+                <div class="px-4 pb-2 border-b flex justify-between items-center shrink-0">
+                    <h3 class="font-bold text-gray-800">Comments</h3>
+                    <button onclick="closeComments()" class="p-2 text-gray-500 hover:text-red-500"><i class="fa-solid fa-times text-lg"></i></button>
+                </div>
+                
+                <div id="comment-list" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"></div>
+
+                <form id="comment-form" class="p-3 border-t bg-white flex gap-2 items-center shrink-0">
+                    <input type="text" id="comment-input" class="flex-1 bg-gray-100 border-0 rounded-full px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Add a comment..." required>
+                    <button type="submit" class="w-10 h-10 bg-brand-600 text-white rounded-full flex items-center justify-center hover:bg-brand-700 shadow-lg transition shrink-0">
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODALS -->
+        <div id="buy-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center">
+            <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 animate-slide-up m-4 shadow-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">Purchase Course</h3>
+                    <button onclick="closeModal('buy-modal')" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-times"></i></button>
+                </div>
+                <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 mb-4 text-sm">
+                    <p class="font-bold text-yellow-800">Send Money to:</p>
+                    <div id="payment-numbers" class="mt-2 space-y-1 font-mono text-gray-700">Loading...</div>
+                </div>
+                <form id="purchase-form" class="space-y-3">
+                    <input type="hidden" id="buy-course-id">
+                    <select id="buy-method" class="w-full p-3 border rounded-xl bg-gray-50 focus:ring-brand-500 focus:border-brand-500" required>
+                        <option value="bkash">Bkash</option>
+                        <option value="nagad">Nagad</option>
+                        <option value="rocket">Rocket</option>
+                    </select>
+                    <input type="text" id="buy-sender" placeholder="Your Phone Number" class="w-full p-3 border rounded-xl focus:ring-brand-500 focus:border-brand-500" required>
+                    <input type="text" id="buy-trx" placeholder="Transaction ID (TrxID)" class="w-full p-3 border rounded-xl focus:ring-brand-500 focus:border-brand-500" required>
+                    <button type="submit" class="w-full bg-brand-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-brand-700 transition">Confirm Payment</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="redeem-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center">
+            <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 animate-slide-up m-4 shadow-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">Unlock Premium Ebook</h3>
+                    <button onclick="closeModal('redeem-modal')" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-times"></i></button>
+                </div>
+                <div class="text-center space-y-4">
+                    <div class="w-16 h-16 bg-brand-50 rounded-full flex items-center justify-center mx-auto">
+                        <i class="fa-solid fa-lock text-brand-600 text-2xl"></i>
+                    </div>
+                    <p class="text-gray-600">
+                        To read <span id="redeem-title" class="font-bold text-gray-800">Title</span>, you need to redeem points.
+                    </p>
+                    <p class="text-2xl font-bold text-brand-600"><i class="fa-solid fa-coins"></i> <span id="redeem-points">0</span> Points</p>
+                    <p class="text-xs text-gray-400">Current Balance: <span id="redeem-user-bal">0</span> Pts</p>
+                    
+                    <input type="hidden" id="redeem-ebook-id">
+                    <input type="hidden" id="redeem-cost">
+                    
+                    <button onclick="confirmRedeem()" class="w-full bg-brand-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-brand-700 transition">
+                        Redeem & Read
+                    </button>
+                </div>
+            </div>
+        </div>
+        
     </div>
 
-    <p class="signature">অনেক দূরে এগিয়ে জাহ আর ফিরে আসিস না ,<br>[তুই ভাল করে জানিস এইরখম উইশ শুধু নাফিজ এ করতে পারে ]</p>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, getDocs, updateDoc, onSnapshot, addDoc, query, where, orderBy, limit, arrayUnion, arrayRemove, setDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-    <button id="show-video" style="margin-top:25px; padding:12px 25px; font-size:1.1em; border:none; border-radius:8px; background:#ff66aa; color:#fff; cursor:pointer;">▶️ সারপ্রাইজ ভিডিও দেখ</button>
-  </div>
+        const firebaseConfig = {
+  apiKey: "AIzaSyCOr0OWwIsigA0RFgFH-5379u_y0W8ozE0",
+  authDomain: "course-app-a5df9.firebaseapp.com",
+  databaseURL: "https://course-app-a5df9-default-rtdb.firebaseio.com",
+  projectId: "course-app-a5df9",
+  storageBucket: "course-app-a5df9.firebasestorage.app",
+  messagingSenderId: "901697913874",
+  appId: "1:901697913874:web:facf41092d6a8f1fe044cb",
+  measurementId: "G-SJDJTB63BZ"
+};
 
-  <!-- Youtube Popup -->
-  <div id="video-popup">
-    <span id="close-popup">&times;</span>
-    <iframe id="yt-video" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-  </div>
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded',()=>{
-      const revealBtn=document.getElementById('reveal-button');
-      const curtainWrapper=document.getElementById('curtain-wrapper');
-      const mainContent=document.getElementById('main-content');
-      const galleryItems=document.querySelectorAll('.gallery-item');
-      const todayDate=document.getElementById('today-date');
+        let currentUserData = null;
+        let currentCourseData = null;
+        let currentEbookData = null; 
+        let watchedVideos = [];
+        let currentVideoUniqueId = null;
 
-      // আজকের তারিখ বসানো
-      const d=new Date();
-      todayDate.textContent=d.toLocaleDateString('bn-BD',{year:'numeric',month:'long',day:'numeric'});
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('flex');
+                
+                onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                    if(docSnap.exists()){
+                        currentUserData = docSnap.data();
+                        currentUserData.uid = user.uid;
+                        updateUI(currentUserData);
+                    }
+                });
 
-      revealBtn.addEventListener('click',()=>{
-        curtainWrapper.classList.add('open');
-        confetti({particleCount:150,spread:180,origin:{y:0.6}});
-        setTimeout(()=>{
-          curtainWrapper.style.display='none';
-          mainContent.classList.add('visible');
-          galleryItems.forEach((item,index)=>{
-            setTimeout(()=>{item.classList.add('revealed');},index*200);
-          });
-        },1500);
-      });
+                loadAppData();
+                initChat(user);
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('flex');
+            }
+        });
 
-      // Popup Video
-      const videoPopup=document.getElementById('video-popup');
-      const closePopup=document.getElementById('close-popup');
-      const ytVideo=document.getElementById('yt-video');
-      document.getElementById('show-video').addEventListener('click',()=>{
-        ytVideo.src="https://www.youtube.com/embed/kVR9oEnTR6Aar?autoplay=1";
-        videoPopup.style.display="flex";
-      });
-      closePopup.addEventListener('click',()=>{
-        ytVideo.src="";
-        videoPopup.style.display="none";
-      });
-    });
-  </script>
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            signInWithEmailAndPassword(auth, email, pass).catch(err => alert(err.message));
+        });
 
+        window.handleLogout = () => signOut(auth);
+
+        function updateUI(user) {
+            document.getElementById('user-points').innerText = user.points || 0;
+            document.getElementById('profile-name').innerText = user.name;
+            document.getElementById('profile-id').innerText = user.id;
+            document.getElementById('profile-roll').innerText = user.roll;
+            document.getElementById('profile-trade').innerText = user.trade || 'Student';
+            document.getElementById('profile-email').innerText = user.email;
+            document.getElementById('profile-phone').innerText = user.phone || 'N/A';
+
+            const imgEl = document.getElementById('profile-img-real');
+            const initDiv = document.getElementById('profile-initial-div');
+            const initTxt = document.getElementById('profile-initial');
+
+            if(user.profileImage && user.profileImage.trim() !== '') {
+                imgEl.src = user.profileImage;
+                imgEl.classList.remove('hidden');
+                initDiv.classList.add('hidden');
+            } else {
+                initTxt.innerText = user.name.charAt(0).toUpperCase();
+                imgEl.classList.add('hidden');
+                initDiv.classList.remove('hidden');
+            }
+            
+            watchedVideos = user.completed_videos || [];
+        }
+
+        async function loadAppData() {
+            const settingsSnap = await getDoc(doc(db, "settings", "global"));
+            if(settingsSnap.exists()) {
+                const s = settingsSnap.data();
+                document.getElementById('app-name').innerText = s.appName;
+                document.getElementById('app-logo').src = s.logoUrl;
+                
+                const slider = document.getElementById('slider-container');
+                slider.innerHTML = s.sliderImages.map((img, i) => `
+                    <img src="${img}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${i===0?'opacity-100':'opacity-0'}" data-slide="${i}">
+                `).join('');
+                startSlider();
+
+                document.getElementById('payment-numbers').innerHTML = `
+                    <div>Bkash: ${s.bkash || 'N/A'}</div>
+                    <div>Nagad: ${s.nagad || 'N/A'}</div>
+                `;
+            }
+            loadCourses();
+            loadEbooks(); 
+            loadNotifications();
+        }
+
+        async function loadCourses() {
+            const snap = await getDocs(collection(db, "courses"));
+            const freeContainer = document.getElementById('free-courses-list');
+            const premContainer = document.getElementById('premium-courses-list');
+            
+            freeContainer.innerHTML = '';
+            premContainer.innerHTML = '';
+
+            snap.forEach(doc => {
+                const c = doc.data();
+                c.id = doc.id;
+                const isOwned = c.type === 'free' || (currentUserData.purchased_courses && currentUserData.purchased_courses.includes(c.id));
+                
+                const card = `
+                <div class="w-full bg-white rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full hover:shadow-lg transition transform hover:-translate-y-1" onclick="${isOwned ? `openCourse('${c.id}')` : `openBuyModal('${c.id}', '${c.title}')`}">
+                    <div class="h-32 md:h-40 bg-gray-300 relative">
+                        <img src="${c.thumbnail}" class="w-full h-full object-cover">
+                        <span class="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded-full text-white font-bold ${c.type==='free'?'bg-green-500':'bg-yellow-500'}">
+                            ${c.type.toUpperCase()}
+                        </span>
+                    </div>
+                    <div class="p-4 flex flex-col flex-1 justify-between">
+                        <h4 class="font-bold text-sm md:text-base leading-tight mb-2 line-clamp-2">${c.title}</h4>
+                        ${c.type !== 'free' ? `
+                            <div class="text-xs">
+                                <span class="text-gray-400 line-through">৳${c.oldPrice}</span>
+                                <span class="text-brand-600 font-bold ml-1 text-sm">৳${c.price}</span>
+                            </div>
+                        ` : '<div class="text-xs text-green-600 font-bold">Free Access</div>'}
+                        <button class="w-full mt-3 py-2 rounded-lg text-xs font-bold ${isOwned ? 'bg-gray-100 text-gray-700' : 'bg-brand-600 text-white'}">
+                            ${isOwned ? 'Start Learning' : 'Buy Now'}
+                        </button>
+                    </div>
+                </div>`;
+
+                if(c.type === 'free') freeContainer.innerHTML += card;
+                else premContainer.innerHTML += card;
+            });
+        }
+
+        async function loadEbooks() {
+            const snap = await getDocs(collection(db, "ebooks"));
+            const freeContainer = document.getElementById('free-ebooks-list');
+            const premContainer = document.getElementById('premium-ebooks-list');
+            
+            freeContainer.innerHTML = '';
+            premContainer.innerHTML = '';
+
+            snap.forEach(doc => {
+                const e = doc.data();
+                e.id = doc.id;
+                
+                const isRedeemed = e.type === 'free' || (currentUserData.redeemed_ebooks && currentUserData.redeemed_ebooks.includes(e.id));
+
+                const card = `
+                <div class="w-full bg-white rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full hover:shadow-lg transition transform hover:-translate-y-1" 
+                     onclick="${isRedeemed ? `openEbookPreview('${e.id}')` : `openRedeemModal('${e.id}', '${e.title}', ${e.points})`}">
+                    <div class="h-40 md:h-48 bg-gray-200 relative">
+                        <img src="${e.thumbnail}" class="w-full h-full object-cover">
+                        <span class="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded-full text-white font-bold ${e.type==='free'?'bg-blue-500':'bg-purple-600'}">
+                            ${e.type === 'free' ? 'FREE PDF' : 'PREMIUM'}
+                        </span>
+                    </div>
+                    <div class="p-4 flex flex-col flex-1 justify-between">
+                        <h4 class="font-bold text-sm md:text-base leading-tight mb-2 line-clamp-2">${e.title}</h4>
+                        ${e.type !== 'free' ? `
+                            <div class="text-xs text-brand-600 font-bold">
+                                <i class="fa-solid fa-coins"></i> ${e.points} Pts
+                            </div>
+                        ` : '<div class="text-xs text-blue-600 font-bold">Free Read</div>'}
+                        
+                        <button class="w-full mt-3 py-2 rounded-lg text-xs font-bold ${isRedeemed ? 'bg-gray-100 text-gray-700' : 'bg-brand-600 text-white'}">
+                            ${isRedeemed ? '<i class="fa-solid fa-book-open"></i> Read' : '<i class="fa-solid fa-lock"></i> Unlock'}
+                        </button>
+                    </div>
+                </div>`;
+
+                if(e.type === 'free') freeContainer.innerHTML += card;
+                else premContainer.innerHTML += card;
+            });
+        }
+
+        window.openEbookPreview = async (ebookId) => {
+            const docRef = doc(db, "ebooks", ebookId);
+            const snap = await getDoc(docRef);
+            if(!snap.exists()) return;
+
+            currentEbookData = snap.data();
+            currentEbookData.id = ebookId;
+
+            document.getElementById('course-view').classList.add('hidden'); 
+            document.getElementById('ebook-view').classList.remove('hidden');
+            
+            document.getElementById('eb-title').innerText = currentEbookData.title;
+            document.getElementById('eb-preview-title').innerText = currentEbookData.title;
+            // Updated: Use previewImage if available, else thumbnail
+            document.getElementById('eb-cover-preview').src = currentEbookData.previewImage || currentEbookData.thumbnail;
+            
+            document.getElementById('eb-preview-container').classList.remove('hidden');
+            document.getElementById('eb-frame-container').classList.add('hidden');
+            document.getElementById('eb-viewer').src = "";
+        };
+
+        window.startReading = () => {
+             document.getElementById('eb-preview-container').classList.add('hidden');
+             document.getElementById('eb-frame-container').classList.remove('hidden');
+             document.getElementById('eb-viewer').src = currentEbookData.pdfUrl;
+        }
+
+        window.closeEbook = () => {
+            document.getElementById('ebook-view').classList.add('hidden');
+            document.getElementById('eb-viewer').src = "";
+            currentEbookData = null;
+        }
+
+        window.openRedeemModal = (id, title, points) => {
+            document.getElementById('redeem-modal').classList.remove('hidden');
+            document.getElementById('redeem-ebook-id').value = id;
+            document.getElementById('redeem-cost').value = points;
+            document.getElementById('redeem-title').innerText = title;
+            document.getElementById('redeem-points').innerText = points;
+            document.getElementById('redeem-user-bal').innerText = currentUserData.points || 0;
+        }
+
+        window.confirmRedeem = async () => {
+            const id = document.getElementById('redeem-ebook-id').value;
+            const cost = parseInt(document.getElementById('redeem-cost').value);
+            const currentPoints = currentUserData.points || 0;
+
+            if(currentPoints < cost) {
+                alert("Not enough points to unlock this Ebook!");
+                return;
+            }
+
+            if(confirm(`Spend ${cost} points to unlock?`)) {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    points: increment(-cost),
+                    redeemed_ebooks: arrayUnion(id)
+                });
+                closeModal('redeem-modal');
+                alert("Ebook Unlocked Successfully!");
+                loadEbooks();
+            }
+        }
+
+        window.openCourse = async (courseId) => {
+            const docRef = doc(db, "courses", courseId);
+            const snap = await getDoc(docRef);
+            if(!snap.exists()) return;
+
+            currentCourseData = snap.data();
+            currentCourseData.id = courseId; 
+            
+            document.getElementById('ebook-view').classList.add('hidden'); 
+            document.getElementById('course-view').classList.remove('hidden');
+            document.getElementById('cv-title').innerText = currentCourseData.title;
+            
+            renderSyllabus(currentCourseData.videos);
+            if(currentCourseData.videos.length > 0) playVideo(0);
+        };
+
+        window.closeCourse = () => {
+            document.getElementById('course-view').classList.add('hidden');
+            document.getElementById('cv-player').src = "";
+            currentVideoUniqueId = null;
+        }
+
+        function renderSyllabus(videos) {
+            const list = document.getElementById('cv-syllabus');
+            list.innerHTML = videos.map((v, i) => {
+                const isCompleted = watchedVideos.includes(`${currentCourseData.title}_${i}`);
+                return `
+                <div onclick="playVideo(${i})" class="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 cursor-pointer border border-gray-100 transition">
+                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-sm font-bold border shadow-sm text-gray-500">
+                        ${i + 1}
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm md:text-base font-medium line-clamp-1">${v.title}</p>
+                        <p class="text-xs text-brand-500 font-bold mt-1">+${v.points} Pts (${v.minMinutes || 'Full'} min)</p>
+                    </div>
+                    ${isCompleted ? '<i class="fa-solid fa-check-circle text-green-500 text-xl"></i>' : '<i class="fa-regular fa-circle-play text-gray-400 text-xl"></i>'}
+                </div>
+            `}).join('');
+        }
+
+        let statsUnsubscribe = null;
+
+        // FIXED VIDEO PLAYER CONFIGURATION ERROR
+        window.playVideo = (index) => {
+            const video = currentCourseData.videos[index];
+            const videoId = getYouTubeID(video.url);
+            
+            // Updated src with playsinline and modestbranding, removed origin to fix local file issues
+            document.getElementById('cv-player').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&playsinline=1&modestbranding=1&controls=1`;
+            
+            currentVideoUniqueId = `${currentCourseData.id}_vid_${index}`;
+            incrementViewCount(currentVideoUniqueId);
+
+            if(statsUnsubscribe) statsUnsubscribe();
+            statsUnsubscribe = onSnapshot(doc(db, "video_stats", currentVideoUniqueId), (docSnap) => {
+                if(docSnap.exists()){
+                    const s = docSnap.data();
+                    document.getElementById('vid-like-count').innerText = s.likes ? s.likes.length : 0;
+                    document.getElementById('vid-view-count').innerText = s.views || 0;
+                    
+                    const myUid = auth.currentUser.uid;
+                    const isLiked = s.likes && s.likes.includes(myUid);
+                    const heart = document.getElementById('vid-like-icon');
+                    if(isLiked) {
+                        heart.classList.remove('text-gray-500');
+                        heart.classList.add('text-red-500');
+                    } else {
+                        heart.classList.add('text-gray-500');
+                        heart.classList.remove('text-red-500');
+                    }
+                } else {
+                    document.getElementById('vid-like-count').innerText = 0;
+                    document.getElementById('vid-view-count').innerText = 0;
+                    document.getElementById('vid-like-icon').classList.add('text-gray-500');
+                }
+            });
+
+            const uniqueVidId = `${currentCourseData.title}_${index}`;
+            if(!watchedVideos.includes(uniqueVidId)) {
+                const durationMinutes = video.minMinutes ? parseFloat(video.minMinutes) : 0.5; 
+                const msToWatch = durationMinutes * 60 * 1000;
+                
+                if(window.videoPointTimer) clearTimeout(window.videoPointTimer);
+                
+                window.videoPointTimer = setTimeout(async () => {
+                    await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                        points: (currentUserData.points || 0) + parseInt(video.points),
+                        completed_videos: arrayUnion(uniqueVidId)
+                    });
+                }, msToWatch); 
+            }
+        }
+
+        async function incrementViewCount(vidId) {
+            const ref = doc(db, "video_stats", vidId);
+            try {
+                await updateDoc(ref, { views: increment(1) });
+            } catch(e) {
+                await setDoc(ref, { views: 1, likes: [] }, { merge: true });
+            }
+        }
+
+        window.toggleLike = async () => {
+            if(!currentVideoUniqueId) return;
+            const uid = auth.currentUser.uid;
+            const ref = doc(db, "video_stats", currentVideoUniqueId);
+            const snap = await getDoc(ref);
+            
+            if(snap.exists()) {
+                const data = snap.data();
+                const likes = data.likes || [];
+                if(likes.includes(uid)) {
+                    await updateDoc(ref, { likes: arrayRemove(uid) });
+                } else {
+                    await updateDoc(ref, { likes: arrayUnion(uid) });
+                }
+            } else {
+                await setDoc(ref, { views: 1, likes: [uid] });
+            }
+        }
+
+        let commentsUnsubscribe = null;
+
+        window.openComments = () => {
+            if(!currentVideoUniqueId) return;
+            document.getElementById('comment-sheet').classList.remove('hidden');
+            
+            const q = query(collection(db, "comments"), where("videoId", "==", currentVideoUniqueId));
+            
+            commentsUnsubscribe = onSnapshot(q, (snap) => {
+                const list = document.getElementById('comment-list');
+                list.innerHTML = '';
+                
+                if(snap.empty) {
+                    list.innerHTML = '<p class="text-center text-gray-400 mt-4 text-sm">No comments yet. Be the first!</p>';
+                    return;
+                }
+
+                let comments = [];
+                snap.forEach(doc => {
+                    comments.push({ id: doc.id, ...doc.data() });
+                });
+                comments.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                comments.forEach(c => {
+                    const hasProfileImg = c.userImage && c.userImage.trim() !== '';
+                    const isCommentLiked = c.likes && c.likes.includes(auth.currentUser.uid);
+                    const likeCount = c.likes ? c.likes.length : 0;
+
+                    list.innerHTML += `
+                        <div class="flex gap-3 items-start animate-fade-in-up">
+                            ${hasProfileImg 
+                                ? `<img src="${c.userImage}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-gray-200">`
+                                : `<div class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center font-bold text-brand-600 text-xs shrink-0">${c.userName.charAt(0)}</div>`
+                            }
+                            <div class="flex-1">
+                                <div class="bg-white p-3 rounded-2xl rounded-tl-none border shadow-sm inline-block max-w-[90%]">
+                                    <p class="font-bold text-xs text-gray-800 mb-1">${c.userName}</p>
+                                    <p class="text-sm text-gray-600 break-words leading-relaxed">${c.text}</p>
+                                </div>
+                                <div class="flex items-center gap-4 mt-1 ml-1">
+                                    <button onclick="replyTo('${c.userName}')" class="text-[10px] font-bold text-gray-400 hover:text-brand-600 transition">Reply</button>
+                                    <button onclick="toggleCommentLike('${c.id}')" class="flex items-center gap-1 text-[10px] font-bold ${isCommentLiked ? 'text-brand-600' : 'text-gray-400'} hover:text-brand-600 transition">
+                                        <i class="${isCommentLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i> ${likeCount > 0 ? likeCount : ''}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        window.toggleCommentLike = async (commentId) => {
+            const uid = auth.currentUser.uid;
+            const ref = doc(db, "comments", commentId);
+            const snap = await getDoc(ref);
+
+            if(snap.exists()) {
+                const data = snap.data();
+                const likes = data.likes || [];
+                if(likes.includes(uid)) {
+                    await updateDoc(ref, { likes: arrayRemove(uid) });
+                } else {
+                    await updateDoc(ref, { likes: arrayUnion(uid) });
+                }
+            }
+        }
+
+        window.closeComments = () => {
+            document.getElementById('comment-sheet').classList.add('hidden');
+            if(commentsUnsubscribe) commentsUnsubscribe();
+        }
+
+        window.replyTo = (name) => {
+            const input = document.getElementById('comment-input');
+            input.value = `@${name} `;
+            input.focus();
+        }
+
+        document.getElementById('comment-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('comment-input');
+            const text = input.value.trim();
+            if(!text || !currentVideoUniqueId) return;
+
+            input.value = ''; 
+
+            await addDoc(collection(db, "comments"), {
+                videoId: currentVideoUniqueId,
+                userId: auth.currentUser.uid,
+                userName: currentUserData.name,
+                userImage: currentUserData.profileImage || '',
+                text: text,
+                likes: [],
+                createdAt: serverTimestamp()
+            });
+        });
+
+        function getYouTubeID(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        window.openBuyModal = (id, title) => {
+            document.getElementById('buy-modal').classList.remove('hidden');
+            document.getElementById('buy-course-id').value = id;
+        }
+        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+
+        document.getElementById('purchase-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerText = 'Processing...';
+            btn.disabled = true;
+
+            await addDoc(collection(db, "orders"), {
+                userId: auth.currentUser.uid,
+                userName: currentUserData.name,
+                courseId: document.getElementById('buy-course-id').value,
+                method: document.getElementById('buy-method').value,
+                sender: document.getElementById('buy-sender').value,
+                trxId: document.getElementById('buy-trx').value,
+                status: 'pending',
+                timestamp: new Date()
+            });
+
+            alert('Order submitted! Waiting for Admin approval.');
+            closeModal('buy-modal');
+            btn.innerText = 'Confirm Payment';
+            btn.disabled = false;
+        });
+
+        let currentQuizId = null;
+        let currentQuizPoints = 0;
+
+        async function loadQuiz() {
+            const qSnap = await getDocs(collection(db, "quizzes"));
+            
+            if(qSnap.empty) {
+                document.getElementById('quiz-question').innerText = "No quizzes available.";
+                document.getElementById('quiz-timer').innerText = "";
+                document.getElementById('quiz-options').innerHTML = "";
+                return;
+            }
+
+            const attempted = currentUserData.attempted_quizzes || [];
+            const availableQuizzes = [];
+
+            qSnap.forEach(doc => {
+                if(!attempted.includes(doc.id)) {
+                    availableQuizzes.push({ id: doc.id, ...doc.data() });
+                }
+            });
+
+            if(availableQuizzes.length === 0) {
+                document.getElementById('quiz-question').innerText = "You have completed all questions! Wait for new ones.";
+                document.getElementById('quiz-timer').innerText = "Done";
+                document.getElementById('quiz-options').innerHTML = "";
+                return;
+            }
+            
+            const qData = availableQuizzes[Math.floor(Math.random() * availableQuizzes.length)];
+            currentQuizId = qData.id;
+            currentQuizPoints = qData.points || 5;
+
+            document.getElementById('quiz-question').innerText = qData.question;
+            const opts = document.getElementById('quiz-options');
+            opts.innerHTML = qData.options.map((opt, i) => `
+                <button onclick="submitAnswer(${i}, ${qData.answer})" class="w-full p-4 bg-gray-100 rounded-xl hover:bg-gray-200 text-left transition font-medium">
+                    ${opt}
+                </button>
+            `).join('');
+
+            let time = qData.time ? parseInt(qData.time) : 30; 
+            if(isNaN(time)) time = 30;
+
+            const timerEl = document.getElementById('quiz-timer');
+            timerEl.innerText = `${time}s`;
+            
+            if(window.quizInterval) clearInterval(window.quizInterval);
+
+            window.quizInterval = setInterval(() => {
+                time--;
+                timerEl.innerText = `${time}s`;
+                if(time <= 0) {
+                    clearInterval(window.quizInterval);
+                    handleTimeUp();
+                }
+            }, 1000);
+        }
+
+        async function handleTimeUp() {
+            document.getElementById('quiz-container').innerHTML = "<h3 class='text-red-500 font-bold'>Time's Up!</h3>";
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                attempted_quizzes: arrayUnion(currentQuizId)
+            });
+            setTimeout(() => {
+                location.reload(); 
+            }, 2000);
+        }
+
+        window.submitAnswer = async (selectedIdx, correctIdx) => {
+            clearInterval(window.quizInterval);
+            const container = document.getElementById('quiz-container');
+            
+            if(selectedIdx === correctIdx) {
+                container.innerHTML = `<h3 class='text-green-500 font-bold text-xl mb-2'>Correct!</h3><p>+${currentQuizPoints} Points</p>`;
+                
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    points: (currentUserData.points || 0) + parseInt(currentQuizPoints),
+                    attempted_quizzes: arrayUnion(currentQuizId)
+                });
+
+            } else {
+                container.innerHTML = `<h3 class='text-red-500 font-bold text-xl'>Wrong Answer!</h3>`;
+                
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    attempted_quizzes: arrayUnion(currentQuizId)
+                });
+            }
+
+            setTimeout(() => {
+                document.getElementById('quiz-container').innerHTML = `
+                    <div class="mb-4 text-brand-600 font-bold text-xl" id="quiz-timer">--</div>
+                    <p id="quiz-question" class="text-lg font-medium mb-6">Loading next...</p>
+                    <div id="quiz-options" class="grid grid-cols-1 gap-3"></div>
+                `;
+                loadQuiz();
+            }, 2000);
+        }
+
+        async function loadLeaderboard() {
+            const q = query(collection(db, "users"), orderBy("points", "desc"), limit(20));
+            const snap = await getDocs(q);
+            const list = document.getElementById('leaderboard-list');
+            list.innerHTML = '';
+            
+            let rank = 1;
+            const today = new Date();
+            const isFirstDayOfMonth = today.getDate() === 1;
+
+            snap.forEach((d, index) => {
+                const u = d.data();
+                const isMe = u.uid === auth.currentUser.uid;
+                
+                if (index === 0 && isMe && isFirstDayOfMonth) {
+                    document.getElementById('btn-cert').classList.remove('hidden');
+                    document.getElementById('btn-cert').onclick = () => generateCertificate(u);
+                }
+                
+                list.innerHTML += `
+                    <div class="flex items-center p-4 ${isMe ? 'bg-brand-50' : 'bg-white'}">
+                        <div class="w-8 font-bold text-gray-400 text-center">${rank++}</div>
+                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-600 mx-3">
+                            ${u.name.charAt(0)}
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-sm text-gray-800">${u.name}</p>
+                            <p class="text-xs text-gray-500">${u.trade}</p>
+                        </div>
+                        <div class="font-bold text-brand-600 text-sm">${u.points} pts</div>
+                    </div>
+                `;
+            });
+        }
+
+        window.generateCertificate = (user) => {
+            document.getElementById('cert-name').innerText = user.name;
+            document.getElementById('cert-id').innerText = user.id;
+            document.getElementById('cert-roll').innerText = user.roll;
+            
+            const template = document.getElementById('certificate-template');
+            template.classList.remove('hidden');
+            template.classList.remove('-z-50'); 
+            
+            html2canvas(template, { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                
+                const pdf = new jsPDF('l', 'mm', 'a4'); 
+                const width = pdf.internal.pageSize.getWidth();
+                const height = pdf.internal.pageSize.getHeight();
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+                pdf.save("Certificate_of_Excellence.pdf");
+                
+                template.classList.add('hidden');
+                template.classList.add('-z-50');
+            });
+        }
+
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('section').forEach(el => {
+                if(!el.id.startsWith('course-view') && !el.id.startsWith('ebook-view')) el.classList.add('hidden');
+            });
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('text-brand-600');
+                el.classList.add('text-gray-400');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.querySelector(`button[data-target="${tabId}"]`).classList.add('text-brand-600');
+            document.querySelector(`button[data-target="${tabId}"]`).classList.remove('text-gray-400');
+
+            if(tabId === 'quiz') loadQuiz();
+            if(tabId === 'leaderboard') loadLeaderboard();
+        }
+
+        let currentSlide = 0;
+        function startSlider() {
+            const slides = document.querySelectorAll('#slider-container img');
+            if(slides.length === 0) return;
+            setInterval(() => {
+                slides[currentSlide].classList.remove('opacity-100');
+                slides[currentSlide].classList.add('opacity-0');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.remove('opacity-0');
+                slides[currentSlide].classList.add('opacity-100');
+            }, 4000);
+        }
+
+        let allNotifDocs = [];
+
+        function loadNotifications() {
+            const q = query(collection(db, "notifications"), orderBy("date", "desc"), limit(50));
+            onSnapshot(q, (snap) => {
+                allNotifDocs = [];
+                snap.forEach(doc => {
+                    allNotifDocs.push({id: doc.id, ...doc.data()});
+                });
+                renderNotifications();
+            });
+        }
+
+        window.renderNotifications = () => {
+            const list = document.getElementById('notif-list');
+            list.innerHTML = '';
+            
+            const deletedIds = JSON.parse(localStorage.getItem('deleted_notifs') || '[]');
+            const lastOpenTime = parseInt(localStorage.getItem('notif_last_open_time') || '0');
+            let hasUnread = false;
+
+            const myId = currentUserData ? currentUserData.id : null;
+            
+            const visibleNotifs = allNotifDocs.filter(n => {
+                if(deletedIds.includes(n.id)) return false;
+                if(n.target && n.target !== 'all' && n.target !== myId) return false;
+                return true;
+            });
+
+            if(visibleNotifs.length === 0) {
+                list.innerHTML = `<div class="text-gray-400 text-xs text-center py-4">No new notifications</div>`;
+            } else {
+                visibleNotifs.forEach(n => {
+                    const date = n.date ? new Date(n.date.seconds * 1000).toLocaleDateString() : '';
+                    const isUnread = n.date && (n.date.seconds * 1000) > lastOpenTime;
+                    if(isUnread) hasUnread = true;
+
+                    list.innerHTML += `
+                        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 relative group transition-all">
+                            <div class="flex justify-between items-start mb-1">
+                                 <h5 class="font-bold text-brand-600 text-xs pr-2 flex-1 ${isUnread ? 'text-brand-700' : ''}">${n.title}</h5>
+                                 <button onclick="deleteNotif('${n.id}')" class="text-gray-300 hover:text-red-500 transition p-1"><i class="fa-solid fa-trash text-xs"></i></button>
+                            </div>
+                            <p class="text-gray-600 leading-snug text-xs pr-2">${n.message}</p>
+                            <p class="text-[10px] text-gray-400 mt-1 text-right">${date}</p>
+                            ${isUnread ? '<div class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>' : ''}
+                        </div>
+                    `;
+                });
+            }
+
+            const badge = document.getElementById('notif-badge');
+            const panel = document.getElementById('notif-panel');
+            
+            if (hasUnread && panel.classList.contains('hidden')) {
+                 badge.classList.remove('hidden');
+                 badge.innerText = "!"; 
+            } else {
+                 badge.classList.add('hidden');
+            }
+        }
+
+        window.deleteNotif = (id) => {
+            if(!confirm("Delete this notification?")) return;
+            const deletedIds = JSON.parse(localStorage.getItem('deleted_notifs') || '[]');
+            deletedIds.push(id);
+            localStorage.setItem('deleted_notifs', JSON.stringify(deletedIds));
+            renderNotifications(); 
+        }
+
+        window.toggleNotifs = () => {
+            const panel = document.getElementById('notif-panel');
+            const badge = document.getElementById('notif-badge');
+            
+            const isHidden = panel.classList.contains('hidden');
+            
+            if (isHidden) {
+                panel.classList.remove('hidden');
+                badge.classList.add('hidden'); 
+                
+                localStorage.setItem('notif_last_open_time', Date.now().toString());
+            } else {
+                panel.classList.add('hidden');
+                renderNotifications(); 
+            }
+        };
+        
+        window.toggleChat = () => {
+            document.getElementById('chat-box').classList.toggle('hidden');
+        }
+
+        function initChat(user) {
+            const chatRef = collection(db, "chats", user.uid, "messages");
+            const q = query(chatRef, orderBy("createdAt", "asc"));
+            
+            onSnapshot(q, (snapshot) => {
+                const div = document.getElementById('chat-messages');
+                div.innerHTML = '';
+                if(snapshot.empty) {
+                    div.innerHTML = '<div class="text-center text-xs text-gray-400 mt-2">Start a conversation with Admin</div>';
+                }
+                snapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const isMe = !msg.isAdmin;
+                    div.innerHTML += `
+                        <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                            <div class="${isMe ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-800'} px-4 py-2 rounded-2xl max-w-[80%] text-sm shadow-sm break-words">
+                                ${msg.text}
+                            </div>
+                        </div>
+                    `;
+                });
+                div.scrollTop = div.scrollHeight;
+            });
+
+            document.getElementById('chat-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const input = document.getElementById('chat-input');
+                const text = input.value.trim();
+                if(!text) return;
+                
+                input.value = '';
+                
+                await addDoc(collection(db, "chats", user.uid, "messages"), {
+                    text: text,
+                    createdAt: serverTimestamp(),
+                    isAdmin: false
+                });
+
+                await setDoc(doc(db, "chats", user.uid), {
+                    userName: currentUserData.name, 
+                    lastMessage: text,
+                    lastMessageTime: serverTimestamp(),
+                    unread: true
+                }, { merge: true });
+            });
+        }
+    </script>
 </body>
 </html>
